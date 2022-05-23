@@ -8,6 +8,7 @@ main_url = 'https://hh.ru'
 vacancy = 'Data Scientist'
 page = 0
 all_vacancies = []
+source = 'hh'
 params = {'text': vacancy,
           'area': 1,
           'experience': 'doesNotMatter',
@@ -90,9 +91,14 @@ for vac in vacancy1:
             max_salary = int(num)
             currency = re.split(' ', vacancy_salary)[3]
 
+    #зарплата                
     vacancy_info['макс'] = max_salary
     vacancy_info['мин']  = min_salary
     vacancy_info['валюта'] = currency
+          
+    vacancy_info['источник'] = source
+
+    all_vacancies.append(vacancy_info)      
 
     print(vacancy_info)
 
