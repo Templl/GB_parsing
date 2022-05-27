@@ -1,0 +1,52 @@
+import re
+
+from pymongo import MongoClient
+from pymongo.errors import DuplicateKeyError as dke
+from lxml import html
+import requests
+from pprint import pprint
+
+from datetime import date
+
+url = 'https://yandex.ru/news/'
+headers = {'user-agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.64 Safari/537.36'}
+
+response = requests.get(url, headers=headers)
+dom = html.fromstring(response.text)
+
+items = dom.xpath("//section[@aria-labelledby='top-heading']")
+pprint(items)
+current_date = date.today()
+all_news = []
+patern = str(r"story=.+")
+
+for item in items:
+    news = {}
+    print('новость', item)
+    text = item.xpath(".//text()")
+    link = item.xpath(".//@href")
+    _id = re.search(patern, link[0]).group(0)[6:]
+    news['name'] = text
+    news['link'] = link
+    news['date'] = current_date
+    news['_id'] = _id
+    print(news)
+    all_news.append(news)
+
+
+pprint(all_news)
+
+# #подключаемся к базе монго
+# client = MongoClient('127.0.0.1', 27017)
+# db = client['info_news']  # база данных
+# news_coll = db.news  # название коллекции
+#
+# #загружаем в базу вакансии
+# for i in range(len(all_news)):
+#     try:
+#         news_coll.insert_one(all_news[i])
+#     except dke:
+#         print(f'Новость  "{all_news[i]["name"]}" уже есть в базе')
+
+
+
